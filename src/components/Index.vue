@@ -15,30 +15,39 @@
 </template>
 
 <script>
+import db from "../firebase/init";
 export default {
   name: "Index",
   data() {
     return {
-      smoothies: [
-        {
-          title: "My Brew",
-          slug: "my-brew",
-          ingredients: ["bananas", "coffee", "milk"],
-          id: "1"
-        },
-        {
-          title: "Morning Mood",
-          slug: "morning-mood",
-          ingredients: ["mango", "lime", "juice"],
-          id: "2"
-        }
-      ]
+      smoothies: []
     };
   },
   methods: {
     deleteSmoothie(id) {
       this.smoothies = this.smoothies.filter(smoothie => smoothie.id !== id);
     }
+  },
+  created() {
+    //fetchamo kolekciju iz firestore db
+    db.collection("smoothies")
+      .get()
+      .then(snapshot =>
+        snapshot.docs.forEach(doc => {
+          //temp objekat za pohranu drill-ovanih vrijednosti
+          let newObj = {};
+          newObj.id = doc.id;
+          newObj.title = doc._document.proto.fields.title.stringValue;
+          newObj.slug = doc._document.proto.fields.slug.stringValue;
+          newObj.ingredients = [];
+          doc._document.proto.fields.ingredients.arrayValue.values.forEach(
+            val => {
+              newObj.ingredients.push(val.stringValue);
+            }
+          );
+          this.smoothies.push(newObj);
+        })
+      );
   }
 };
 </script>
