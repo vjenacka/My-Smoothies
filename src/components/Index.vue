@@ -25,7 +25,15 @@ export default {
   },
   methods: {
     deleteSmoothie(id) {
-      this.smoothies = this.smoothies.filter(smoothie => smoothie.id !== id);
+      //brise doc is firestora i filtrira ga iz array
+      db.collection("smoothies")
+        .doc(id)
+        .delete()
+        .then(() => {
+          this.smoothies = this.smoothies.filter(
+            smoothie => smoothie.id !== id
+          );
+        });
     }
   },
   created() {
