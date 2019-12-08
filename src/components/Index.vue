@@ -94,7 +94,7 @@ export default {
     cursor: pointer;
   }
 
-  .edit{
+  .edit {
     padding-left: 6px;
   }
 }
