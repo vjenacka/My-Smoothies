@@ -28,6 +28,7 @@
 
 <script>
 import db from "../firebase/init";
+import slugify from "slugify";
 export default {
   name: "EditSmoothie",
   data() {
@@ -39,7 +40,30 @@ export default {
   },
   methods: {
     editSmoothie() {
-      console.log(this.smoothie.title, this.smoothie.ingredients);
+      if (this.smoothie.title && this.smoothie.ingredients.length) {
+        this.feedback = "";
+        //pretvaramo naslovu u slug radi route-anja
+        this.smoothie.slug = slugify(this.smoothie.title, {
+          replacement: "-",
+          remove: /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/]/gi,
+          lower: true
+        });
+        db.collection("smoothies")
+          .doc(this.smoothie.id)
+          .update({
+            title: this.smoothie.title,
+            ingredients: this.smoothie.ingredients,
+            slug: this.smoothie.slug
+          })
+          .then(() => {
+            this.$router.push({ name: "Index" });
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      } else {
+        this.feedback = "You need to enter a smoothie title and ingredients";
+      }
     },
     addIngredient() {
       if (this.another) {
